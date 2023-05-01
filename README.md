@@ -54,3 +54,22 @@ You are required to:
 
 Consider matching at least a 90% lines of code coverage. If you think it's not possible to reach it, please explain why.
 
+---
+
+## How to run the application
+
+### Requirements
+- Install PHP 8.0
+- Install Composer
+- Install SQLite3
+### Run migrations and seed the database
+```sh
+php artisan migrate:fresh --seed
+```
+**NOTE**: This command will **drop** all the current tables in the database and run again all the migrations. Run `php artisan db:seed` if you only want to seed the DB.
+
+### Run the command
+```sh
+php artisan banned-users:get
+```
+You can add the `--help` option at the end of the command to show more information about the command, its arguments and options.
