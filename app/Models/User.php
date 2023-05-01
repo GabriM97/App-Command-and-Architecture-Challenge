@@ -39,4 +39,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->belongsToMany(Role::class, 'roles_users');
     }
+
+    public function getBannedAtAttribute($value): string
+    {
+        return $this->asDateTime($value)->format('Y-m-d\TH:i:s');
+    }
 }

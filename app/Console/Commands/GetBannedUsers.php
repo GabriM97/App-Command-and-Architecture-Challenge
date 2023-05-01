@@ -32,6 +32,8 @@ class GetBannedUsers extends Command
 
     protected const OUTPUT_FILE = 'banned_users.csv';
 
+    protected const FILE_SEPARATOR = ';';
+
     /**
      * Instantiate the GetBannedUsers command.
      *
@@ -81,7 +83,7 @@ class GetBannedUsers extends Command
         
         // save output to file
         if ($path = $input['save-to']) {
-            $this->commandOutput->printFile($path, $bannedUsers->toArray(), $headers, ';', self::OUTPUT_FILE);
+            $this->commandOutput->printFile($path, $bannedUsers, $headers, self::FILE_SEPARATOR, self::OUTPUT_FILE, true);
         }
     }
 }
