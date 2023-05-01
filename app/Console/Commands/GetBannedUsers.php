@@ -2,71 +2,86 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
+use App\Services\CommandOutput;
 use Illuminate\Console\Command;
+use App\Repositories\UserRepository;
+use App\Services\UsersCommandsOptionsResolver;
+use App\Validators\GetBannedUsersInputValidator;
 
 class GetBannedUsers extends Command
 {
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'banned-users:get {save-to?} {--active-users-only} {--with-trashed} {--trashed-only} {--no-admin} {--admin-only} {sort-by=email} {--with-headers}';
+    protected $signature = 'banned-users:get 
+                                {save-to? : The absolute filepath in which store the output.}
+                                {sort-by=email : The field to use when sorting the output.}
+                                {--active-users-only : Will only show banned users that have been previously activated.}
+                                {--with-trashed : Will show banned users, including the users deleted.}
+                                {--trashed-only : Will only show banned users that have been deleted.}
+                                {--no-admin : Will show the banned users excluding the `admin` users.}
+                                {--admin-only : Will only show the banned users that are `admin`.}
+                                {--with-headers : Will print and save column headers.}';
 
     /**
      * The console command description.
      */
-    protected $description = 'Get banned users';
+    protected $description = 'Get banned users.';
+
+    public const COLUMN_HEADERS = ['id', 'email', 'banned_at'];
+
+    protected const OUTPUT_FILE = 'banned_users.csv';
+
+    /**
+     * Instantiate the GetBannedUsers command.
+     *
+     * @param  GetBannedUsersInputValidator $validator  validates the user input
+     * @param  UsersCommandsOptionsResolver $optionsResolver    resolves the options to process
+     * @param  UserRepository $userRepository   retrieves the user data
+     * @param  CommandOutput $commandOutput     prints the output
+     * @return void
+     */
+    public function __construct(
+        protected GetBannedUsersInputValidator $validator,
+        protected UsersCommandsOptionsResolver $optionsResolver,
+        protected UserRepository $userRepository,
+        protected CommandOutput $commandOutput
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $query = null;
+        // Validate options and arguments in input
+        $input = array_merge($this->options(), $this->arguments());
+        $this->validator->validate($input);
 
-        if($this->option('with-trashed')) {
-           $query = User::withTrashed();
-        } else if ($this->option('trashed-only')) {
-            $query = User::onlyTrashed();
-        } else {
-            $query = User::withoutTrashed();
-        }
+        // Resolve the given options
+        $options = $this->optionsResolver->resolve($input);
 
-        $query = $query->whereNotNull('banned_at');
+        // Get banned users with options
+        $bannedUsers = 
+            $this->userRepository
+                ->getBannedUsers(
+                    self::COLUMN_HEADERS,
+                    $options['trashed'],
+                    $options['admin'],
+                    $options['active'],
+                    $options['sort-by']
+                );
 
-        if($this->option('active-users-only')) {
-            $query = $query->whereNull('activated_at');
-        }
+        $this->commandOutput->setOutput($this->output);
 
-        if($this->option('no-admin')) {
-            $query = $query->whereHas('roles', function (\Illuminate\Database\Eloquent\Builder $builder) {
-                $builder->where('name', '<>', 'ADMIN');
-            });
-        }
-
-        if($this->option('admin-only')) {
-            $query = $query->whereHas('roles', function (\Illuminate\Database\Eloquent\Builder $builder) { $builder->where('name', 'admin'); });
-        }
-
-        $o = [];
-        /** @var User $user */
-        foreach($query->get() as $user) {
-            $o[] = [
-                'email' => $user->email,
-                'banned_at' => $user->banned_at,
-                'id' => $user->id,
-            ];
-        }
-        $uu = '';
-        foreach ($o as $u) {
-            $uu .= $u['id']. ';'.$u['email'] . ";" . $u['banned_at'].PHP_EOL;
-        }
-        if($this->option('with-headers')) {
-            echo 'id;email;banned_at';
-        }
-        echo ($uu);
-        if($this->argument('save-to')) {
-            file_put_contents(explode('=',$this->argument('save-to'))[1],$uu);
+        // print output to CLI
+        $headers = $input['with-headers'] ? self::COLUMN_HEADERS : [];
+        $this->commandOutput->printTable($bannedUsers, $headers);
+        
+        // save output to file
+        if ($path = $input['save-to']) {
+            $this->commandOutput->printFile($path, $bannedUsers->toArray(), $headers, ';', self::OUTPUT_FILE);
         }
     }
 }
