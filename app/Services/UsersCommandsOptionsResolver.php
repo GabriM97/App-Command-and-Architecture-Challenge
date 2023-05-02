@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Query;
+use App\Exceptions\IncompatibleOptionsException;
 
 class UsersCommandsOptionsResolver
 {
@@ -11,9 +12,18 @@ class UsersCommandsOptionsResolver
      *
      * @param  array $options
      * @return array
+     * @throws IncompatibleOptionsException
      */
     public function resolve(array $options): array
     {
+        if ($options['with-trashed'] && $options['trashed-only']) {
+            throw new IncompatibleOptionsException('with-trashed', 'trashed-only');
+        }
+
+        if ($options['no-admin'] && $options['admin-only']) {
+            throw new IncompatibleOptionsException('no-admin', 'admin-only');
+        }
+
         // default resolution
         $resolvedOptions = [
             'trashed' => Query::Exclude,
