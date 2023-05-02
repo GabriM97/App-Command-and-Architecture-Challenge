@@ -27,8 +27,11 @@ class GetBannedUsersInputValidator {
                 'with-trashed' => new WithoutField('trashed-only'),
                 'trashed-only' => new WithoutField('with-trashed'),
 
-                'sort-by' => Rule::in(GetBannedUsers::COLUMN_HEADERS),
-                'save-to' => new HasWritePermissionRecursive,
+                'sort-by' => ['required', Rule::in(GetBannedUsers::COLUMN_HEADERS)],
+                'save-to' => ['nullable', new HasWritePermissionRecursive],
+            ],
+            [
+                'in' => 'The :attribute field must be one of: ' . implode(', ', GetBannedUsers::COLUMN_HEADERS)
             ]
         )->validate();
     }
