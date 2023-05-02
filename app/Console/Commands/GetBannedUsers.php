@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use App\Repositories\UserRepository;
 use App\Services\UsersCommandsOptionsResolver;
 use App\Validators\GetBannedUsersInputValidator;
+use App\Exceptions\CannotOverrideExistingFileException;
 
 class GetBannedUsers extends Command
 {
@@ -75,15 +76,36 @@ class GetBannedUsers extends Command
                     $options['sort-by']
                 );
 
-        $this->commandOutput->setOutput($this->output);
-
         // print output to CLI
         $headers = $input['with-headers'] ? self::COLUMN_HEADERS : [];
+        $this->commandOutput->setOutput($this->output);
         $this->commandOutput->printTable($bannedUsers, $headers);
         
         // save output to file
         if ($path = $input['save-to']) {
-            $this->commandOutput->printFile($path, $bannedUsers, $headers, self::FILE_SEPARATOR, self::OUTPUT_FILE, true);
+            try {
+                // try printing the output to file
+                $filepath = 
+                    $this->commandOutput->printFile(
+                        $path, $bannedUsers, $headers, self::FILE_SEPARATOR, self::OUTPUT_FILE, true
+                    );
+            } catch (CannotOverrideExistingFileException $e) {
+                // ask user if they want to override the file
+                $confirm = $this->confirm($e->getMessage() . ' Do you want to override the file anyway?');
+           
+                if ($confirm === false) {
+                    $this->output->info('File not overridden. Content not saved to file.');
+
+                    return;
+                }
+                
+                // print the output to file and enforce file overriding
+                $filepath = 
+                    $this->commandOutput->printFile(
+                        $path, $bannedUsers, $headers, self::FILE_SEPARATOR, self::OUTPUT_FILE, true, true
+                    );
+            }
+            $this->output->info('Content saved to `' . $filepath . '`.');
         }
     }
 }

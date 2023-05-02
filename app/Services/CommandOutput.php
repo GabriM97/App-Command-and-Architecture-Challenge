@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Console\Concerns\InteractsWithIO;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
+use App\Exceptions\CannotOverrideExistingFileException;
 
 class CommandOutput
 {
@@ -30,7 +31,7 @@ class CommandOutput
     protected array $fileColumnsStyle = [];
 
     /**
-     * @var BufferedOutput $bufferedOutput console buffered output to be used as hack for file formatting.
+     * @param BufferedOutput $bufferedOutput console buffered output to be used as hack for file formatting.
      */
     public function __construct(protected BufferedOutput $bufferedOutput)
     {
@@ -60,7 +61,8 @@ class CommandOutput
      * @param  string $separator
      * @param  string $defaultFilename
      * @param  bool $removeEmptySpaces
-     * @return void
+     * @param  bool $forceOverride
+     * @return string
      */
     public function printFile(
         string $path,
@@ -68,19 +70,16 @@ class CommandOutput
         array $headers = [],
         string $separator = ' ',
         string $defaultFilename = self::DEFAULT_OUTPUT_FILE,
-        bool $removeEmptySpaces = false
-    ): void {
+        bool $removeEmptySpaces = false,
+        bool $forceOverride = false
+    ): string {
         
         // get the final filepath appending the default filename if $path is a dir
         $filepath = $this->getFinalFilepath($path, $defaultFilename);
 
-        // make sure the user is aware of a potential file override
-        if (File::exists($filepath)) {
-            $confirm = $this->output->confirm('The file `' . $filepath . '` already exists and will be overrid. Do you want to continue?');
-            if ($confirm === false) {
-                $this->output->info('File not overridden. Content not saved to file.');
-                return;
-            }
+        // check for file existance and throw exception if file can't be overridden
+        if (File::exists($filepath) && $forceOverride === false) {
+            throw new CannotOverrideExistingFileException($filepath);
         }
 
         // create all the non-existing directories
@@ -92,7 +91,7 @@ class CommandOutput
         // write the content to file
         File::put($filepath, $formattedContent);
 
-        $this->output->info('Content saved to `' . $filepath . '`');
+        return $filepath;
     }
 
     /**
