@@ -2,10 +2,18 @@
 
 namespace Tests;
 
+use Mockery;
+use App\Models\User;
+use Mockery\MockInterface;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * @var $userAlias an alias mock for the User model
+     */
+    protected User|MockInterface $userAlias;
+
     /**
      * Creates the application.
      *
@@ -14,5 +22,12 @@ abstract class TestCase extends BaseTestCase
     public function createApplication()
     {
         return require __DIR__.'/../bootstrap/app.php';
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->userAlias = Mockery::mock('alias:' . User::class);
     }
 }
