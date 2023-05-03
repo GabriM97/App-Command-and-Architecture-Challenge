@@ -23,7 +23,7 @@ class CannotOverrideExistingFileException extends Exception
         int $code = 0, 
         Throwable|null $previous = null
     ) {
-        parent::__construct(sprintf($this->customeMessage, $filename), $code, $previous);
+        parent::__construct(sprintf($this->customeMessage, $this->filename), $code, $previous);
     }
 
     /**
