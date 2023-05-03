@@ -92,9 +92,9 @@ class GetBannedUsers extends Command
             } catch (CannotOverrideExistingFileException $e) {
                 // ask user if they want to override the file
                 $confirm = $this->confirm($e->getMessage() . ' Do you want to override the file anyway?');
-           
+
                 if ($confirm === false) {
-                    $this->output->info('File not overridden. Content not saved to file.');
+                    $this->info('File not overridden. Content not saved to file.');
 
                     return;
                 }
@@ -105,7 +105,43 @@ class GetBannedUsers extends Command
                         $path, $bannedUsers, $headers, self::FILE_SEPARATOR, self::OUTPUT_FILE, true, true
                     );
             }
-            $this->output->info('Content saved to `' . $filepath . '`.');
+            $this->info('Content saved to `' . $filepath . '`.');
         }
+    }
+
+    /**
+     * @param  $validator
+     * @return void
+     */
+    public function setValidator ($validator)
+    {
+        $this->validator = $validator;
+    }
+
+    /**
+     * @param  $optionsResolver
+     * @return void
+     */
+    public function setOptionsResolver ($optionsResolver)
+    {
+        $this->optionsResolver = $optionsResolver;
+    }
+
+    /**
+     * @param  $userRepository
+     * @return void
+     */
+    public function setUserRepository ($userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
+    /**
+     * @param  $commandOutput
+     * @return void
+     */
+    public function setCommandOutput ($commandOutput)
+    {
+        $this->commandOutput = $commandOutput;
     }
 }
