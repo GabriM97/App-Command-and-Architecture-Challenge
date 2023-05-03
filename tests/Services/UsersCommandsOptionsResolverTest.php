@@ -2,7 +2,6 @@
 
 namespace Tests\Services;
 
-use Mockery;
 use Tests\TestCase;
 use App\Enums\Query;
 use App\Exceptions\IncompatibleOptionsException;
@@ -11,7 +10,7 @@ use App\Services\UsersCommandsOptionsResolver;
 class UsersCommandsOptionsResolverTest extends TestCase
 {
     /**
-     * @var $resolver
+     * @var $resolver the user commands options resolver instance
      */
     protected UsersCommandsOptionsResolver $resolver;
 

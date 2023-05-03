@@ -8,8 +8,8 @@ use App\Rules\WithoutField;
 use App\Rules\HasWritePermissionRecursive;
 use Illuminate\Support\Facades\Validator;
 
-class GetBannedUsersInputValidator {
-    
+class GetBannedUsersInputValidator
+{
     /**
      * Validate the given user's input for the banned-users:get command using the specified rules.
      *
@@ -35,5 +35,4 @@ class GetBannedUsersInputValidator {
             ]
         )->validate();
     }
-
 }
