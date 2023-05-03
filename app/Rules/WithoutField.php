@@ -15,7 +15,7 @@ class WithoutField implements DataAwareRule, InvokableRule
     /**
      * @var string $message The message to print in case of failed validation
      */
-    protected string $message = 'The option `:attribute` is only allowed without the `%s` option.';
+    protected string $message = 'The option `%s` is only allowed without the `%s` option.';
 
     /**
      * Instantiate the Without rule.
@@ -40,7 +40,7 @@ class WithoutField implements DataAwareRule, InvokableRule
     {
         if (!empty($value) && !empty($this->data[$this->without])) {
             // fails only when both attributes are present
-            $fail(sprintf($this->message, $this->without));
+            $fail(sprintf($this->message, $attribute, $this->without));
         }
     }
 
