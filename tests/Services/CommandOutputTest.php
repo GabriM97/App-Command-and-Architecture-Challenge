@@ -51,20 +51,19 @@ class CommandOutputTest extends TestCase
     {
         parent::setUp();
 
+        $this->bufferedOutput = Mockery::mock(BufferedOutput::class);
+
         $this->commandOutput = 
-            Mockery::mock(CommandOutput::class)->makePartial()
+            Mockery::mock(CommandOutput::class, [$this->bufferedOutput])->makePartial()
                 ->shouldAllowMockingProtectedMethods();
+
+        $this->output = Mockery::mock(OutputStyle::class);
+        $this->commandOutput->setOutput($this->output);
 
         $this->headers = ['id', 'name'];
         $this->defaultFilename = CommandOutput::DEFAULT_OUTPUT_FILE;
 
         $this->makeContent([$this->userAlias]);
-
-        $this->bufferedOutput = Mockery::mock(BufferedOutput::class);
-        $this->commandOutput->setBufferedOutput($this->bufferedOutput);
-        
-        $this->output = Mockery::mock(OutputStyle::class);
-        $this->commandOutput->setOutput($this->output);
     }
 
     /**

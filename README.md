@@ -62,6 +62,7 @@ Consider matching at least a 90% lines of code coverage. If you think it's not p
 - Install PHP 8.0
 - Install Composer
 - Install SQLite3
+
 ### Run migrations and seed the database
 ```sh
 php artisan migrate:fresh --seed
@@ -73,3 +74,17 @@ php artisan migrate:fresh --seed
 php artisan banned-users:get
 ```
 You can add the `--help` option at the end of the command to show more information about the command, its arguments and options.
+
+### Run tests and code coverage (~94%)
+
+**Note:** XDebug needs to be installed and enabled.
+
+Tests only:
+```sh
+./vendor/bin/phpunit
+```
+
+Code coverage:
+```sh
+`XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text -c phpunit-coverage.xml`
+```

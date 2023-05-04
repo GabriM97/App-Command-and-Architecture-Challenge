@@ -7,3 +7,4 @@ Homestead.yaml
 test-reports
 bin
 /database/database.sqlite
+/coverage

@@ -8,15 +8,13 @@
             <directory suffix=".php">./app/Providers</directory>
             <directory suffix=".php">./app/Exceptions</directory>
             <directory suffix=".php">./app/Jobs</directory>
+            <directory suffix=".php">./app/Models</directory>
             <file>./app/Http/Middleware/Authenticate.php</file>
         </exclude>
     </coverage>
     <testsuites>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
+        <testsuite name="Tests">
+            <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
     <php>
