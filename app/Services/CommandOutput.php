@@ -13,7 +13,7 @@ class CommandOutput
 {
     use InteractsWithIO;
 
-    protected const DEFAULT_OUTPUT_FILE = 'no-name.txt';
+    public const DEFAULT_OUTPUT_FILE = 'no-name.txt';
 
     /**
      * @var string $consoleTableStyle  the default table style of the console output.
@@ -121,13 +121,13 @@ class CommandOutput
     /**
      * Init the default table styling to use for each column in the file output.
      *
-     * @param  int $indexes
+     * @param  int $columns
      * @param  string $delimiter
      * @return void
      */
-    protected function initFileColumnsStyle(int $indexes = 1, string $delimiter = '')
+    protected function initFileColumnsStyle(int $columns = 1, string $delimiter = '')
     {
-        $this->fileColumnsStyle = Collection::times($indexes, function () use ($delimiter) {
+        $this->fileColumnsStyle = Collection::times($columns, function () use ($delimiter) {
             return (new TableStyle())
                 ->setHorizontalBorderChars('')
                 ->setVerticalBorderChars('')
@@ -146,7 +146,7 @@ class CommandOutput
      * @param  bool $removeEmptySpaces
      * @return string
      */
-    private function getFormattedContent(
+    protected function getFormattedContent(
         Collection $content,
         string $separator,
         array $headers,
@@ -188,6 +188,16 @@ class CommandOutput
     public function setOutput($output): void
     {
         $this->output = $output;
+    }
+
+    /**
+     * Set the buffered output instance.
+     * 
+     * @return void
+     */
+    public function setBufferedOutput($bufferedOutput): void
+    {
+        $this->bufferedOutput = $bufferedOutput;
     }
 
     /**
