@@ -1,8 +1,6 @@
-# TourRadar
+# App Command and Architecture Challenge
 
-## Software Engineer Test Case
-
-This test case consists of 2 parts:
+This project case consists of 2 parts:
 
 - [The architecture challenge](#the-architecture-challenge)
 - [The coding challenge](#the-coding-challenge)
