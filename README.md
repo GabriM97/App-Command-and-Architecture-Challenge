@@ -86,3 +86,31 @@ Code coverage:
 ```sh
 `XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-text -c phpunit-coverage.xml`
 ```
+
+## Solution
+
+### The Architecture Challenge
+
+![new-architecture](storage/images/new-architecture.png)
+
+The new proposed diagram can be found at the following link: https://drive.google.com/file/d/1BTs2UQ3M446NMGiXq3Lbisyz9ZWqvU05/view?usp=sharing
+
+A description of all the components and the choices made: https://docs.google.com/document/d/1saAphgZ3vcKZCnTZYg3IJmOtbLHjHvhrcB4NlL-TbzE/edit?usp=sharing
+
+### The Coding Challenge
+
+Refactored the GetBannedUsers command and fixed some logic bugs using Laravel services and best practices.
+
+Added the following services and classes with main focus on re-usability:
+
+- `UserRepository`
+- `GetBannedUsersInputValidator`
+- `HasWritePermissionRecursive` (Validation rule)
+- `WithoutField` (Validation rule)
+- `UsersCommandsOptionsResolver`
+- `CommandOutput` Service
+
+A test class has been added for each service with a total code coverage of ~94%
+
+---
+Future improvements: The CommandOutput class should lift off the responsibility to write the output in a file and move away from the current "hacky" solution implemented. A good solution would be to implement another service, such as a CSV Writer, that will be responsible for this only. The requirement should be discussed with the stakeholders to understand better their needs, and if a CSV format would work for them.
